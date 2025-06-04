@@ -1,5 +1,6 @@
 <?php
 session_start();
+echo "Dashboard loaded successfully!";
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
