@@ -1,0 +1,587 @@
+/* ======= COLOR PALETTE ======= */
+:root {
+  --primary: #0d47a1;
+  --primary-hover: #1565c0;
+  --background: #121212;
+  --surface: #1f1f2e;
+  --white: #ffffff;
+  --light: #cfd8dc;
+  --accent: #4fc3f7;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* ======= RESET ======= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--background);
+  color: var(--white);
+}
+
+/* ======= LOGIN PAGE ======= */
+.login-body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),  /* 60% dark overlay */
+    url('../images/login-bg.jpg');                            /* <-- Your image */
+  background-size: cover;
+  background-position: center;
+}
+
+
+.login-wrapper {
+  background: rgba(31, 31, 46, 0.7); /* 70% transparent */
+  padding: 40px 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 0 15px var(--shadow);
+  backdrop-filter: blur(6px); /* optional: glassy blur effect */
+}
+
+
+.login-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: var(--white);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.login-logo img {
+  width: 200px;
+  height: auto;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  color: var(--light);
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.7); /* white with 70% transparency */
+  color: #000; /* black text for better contrast */
+  font-size: 1rem;
+}
+
+
+.input-group input:focus {
+  outline: 2px solid var(--primary);
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.forgot-password a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* ======= DASHBOARD LAYOUT ======= */
+.sidebar {
+  width: 220px; /* increase width from 180px or so if needed */
+  background-color: #1a1a1a;
+  color: white;
+  height: 100vh;
+  position: fixed;
+  padding: 20px 10px;
+  box-sizing: border-box;
+}
+
+.logo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--white);
+}
+
+.menu a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  margin: 5px 0;
+  white-space: nowrap; /* prevent text from wrapping */
+  overflow: hidden;     /* optional: hide overflow */
+  text-overflow: ellipsis; /* optional: show "..." if too long */
+}
+
+.menu a:hover {
+  background-color: var(--primary-hover);
+}
+
+.main-content {
+  margin-left: 220px;
+  min-height: 100vh;
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), /* 30% dark overlay */
+    url('../images/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+/* ======= HEADER ======= */
+.top-header {
+  background-color: var(--surface);
+  height: 75px;
+  border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background-color: var(--primary-hover);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ======= DASHBOARD TILES ======= */
+.dashboard {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  justify-items: center;
+}
+
+.tile {
+  background-color: var(--surface);
+  width: 100%;
+  height: 160px;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 0 10px var(--shadow);
+  cursor: pointer;
+}
+
+.tile:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.tile-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: var(--light);
+}
+
+.tile-count {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1000;
+  }
+
+  .main-content {
+    margin-left: 0;
+    margin-top: 100px;
+  }
+
+  .dashboard {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .top-header {
+    justify-content: center;
+  }
+}
+.logo-img {
+  width: 120px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.form-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.form-card h3 {
+  margin-top: 0;
+}
+.input-group {
+  margin-bottom: 15px;
+}
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+/* ===== Modal Styles for Add User ===== */
+/* Add this to style.css */
+/* Add this to style.css */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(19, 11, 36, 0.8); /* Blue overlay */
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal.active {
+  display: flex;s
+}
+
+.modal-content {
+  background: #003366; /* Deep blue */
+  padding: 2rem;
+  border-radius: 10px;
+  width: 400px;
+  position: relative;
+  color: white;
+}
+
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+  color: #002060;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: #002060;
+  cursor: pointer;
+}
+/* Section heading */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  color: #002060;
+}
+
+.add-user-btn {
+  padding: 10px 20px;
+  background-color: #002060;
+  color: #3c1952;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-user-btn:hover {
+  background-color: #003080;
+}
+
+.edit-btn,
+.delete-btn {
+  background-color: #007BFF; /* Same as .add-user-btn */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #a71d2a;
+}
+
+
+/* Table styling */
+.users-table-container {
+  overflow-x: auto;
+  background-color: #0a162f;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgb(33, 7, 49);
+  color: #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.users-table th,
+.users-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.users-table thead {
+  background-color: #002060;
+  color: rgb(26, 8, 41);
+}
+
+.users-table tr:nth-child(even) {
+  background-color: #f0f2f8;
+}
+
+.users-table tr:hover {
+  background-color: #e6f0ff;
+}
+    .main-content {
+      padding: 2rem;
+    }
+
+    .user-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #f0f4f8;
+      color: #222;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .user-table th, .user-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    .user-table th {
+      background-color: #003366;
+      color: #fff;
+    }
+
+    .add-user-btn {
+      background: #0055aa;
+      color: #fff;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .add-user-btn:hover {
+      background: #004080;
+    }
+
+
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .close-btn:hover {
+      color: red;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .submit-btn {
+      background: #007bff;
+      color: #fff;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .submit-btn:hover {
+      background: #0056b3;
+    }
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.small-btn {
+  font-size: 13px;
+  padding: 4px 10px;
+}
+
+.danger-btn {
+  background-color: #dc3545;
+}
+
+.danger-btn:hover {
+  background-color: #c82333;
+}
+.alert {
+  margin: 10px auto;
+  width: 90%;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  animation: fadeOut 4s forwards;
+}
+
+.alert.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
