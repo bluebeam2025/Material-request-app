@@ -1,21 +1,14 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 session_start();
-?>
-
-session_start();
-echo "Dashboard loaded successfully!";
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
 
 include 'php/db_connect.php';
+if (!$conn) { die("Database connection failed."); }
 
-$user_type = $_SESSION['user_type']; // admin, approver1, approver2, user
-
-// Fetch total users if approver or admin
+$user_type = $_SESSION['user_type'];
 $totalUsers = 0;
 $totalProjects = 0;
 
@@ -42,7 +35,6 @@ if (in_array($user_type, ['admin', 'approver1', 'approver2'])) {
     <div class="logo">
       <img src="images/logo.png" alt="Company Logo" class="logo-img" />
     </div>
-
     <nav class="menu">
       <a href="dashboard.php">Dashboard</a>
 
@@ -80,7 +72,6 @@ if (in_array($user_type, ['admin', 'approver1', 'approver2'])) {
     </header>
 
     <main class="dashboard">
-      <!-- Dashboard Tiles -->
       <div class="tile"><div class="tile-title">Material Requests</div><div class="tile-count">Coming Soon</div></div>
       <div class="tile"><div class="tile-title">Leave Requests</div><div class="tile-count">Coming Soon</div></div>
       <div class="tile"><div class="tile-title">Expense Requests</div><div class="tile-count">Coming Soon</div></div>
@@ -93,6 +84,5 @@ if (in_array($user_type, ['admin', 'approver1', 'approver2'])) {
       <?php endif; ?>
     </main>
   </div>
-
 </body>
 </html>
