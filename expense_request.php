@@ -83,7 +83,7 @@ $expenses = $conn->query("
           <td><?= number_format($e['total_out'], 2) ?></td>
           <td><?= number_format($e['balance'], 2) ?></td>
           <td>
-            <a class="open-btn" href="php/add_expense.php?= $e['id'] ?>">Open</a>
+            <a class="open-btn" href="php/view_expense.php?= $e['id'] ?>">Open</a>
           </td>
         </tr>
       <?php endforeach; else: ?>
