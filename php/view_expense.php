@@ -6,7 +6,6 @@ error_reporting(E_ALL);
 session_start();
 include('db_connect.php');
 
-
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
   header("Location: dashboard.php");
   exit();
@@ -29,7 +28,7 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
 <html><head>
   <meta charset="UTF-8">
   <title>Expense Sheet - <?= htmlspecialchars($sheet['project_name']) ?></title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="../css/style.css">
   <style>
     table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; }
     th, td { padding: 10px 12px; border: 1px solid #ccc; font-size: 0.92rem; color: #000; }
@@ -38,13 +37,13 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
     .save-btn { background: #2e7d32; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; margin-top: 10px; }
   </style>
 </head><body>
-<?php include 'partials/sidebar.php'; ?>
-<?php include 'partials/header.php'; ?>
+<?php include '../partials/sidebar.php'; ?>
+<?php include '../partials/header.php'; ?>
 
 <div class="main-content">
   <h2>Expense Sheet – <?= htmlspecialchars($sheet['project_name']) ?></h2>
 
-  <form method="POST" action="php/update_expense.php">
+  <form method="POST" action="update_expense.php">
     <input type="hidden" name="request_id" value="<?= $sheet['id'] ?>">
     <table>
       <thead>
