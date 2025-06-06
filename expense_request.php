@@ -60,7 +60,7 @@ $expenses = $conn->query("
 <div class="main-content">
   <div class="user-header" style="display: flex; justify-content: space-between; align-items: center;">
     <h2>Expense Requests</h2>
-    <a href="php/add_expense.php" class="add-user-btn">+ Add Expense Sheet</a>
+    <a href="add_expense_sheet.php" class="add-user-btn">+ Add Expense Sheet</a>
   </div>
 
   <table>
