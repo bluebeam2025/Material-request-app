@@ -1,9 +1,5 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
   header('Location: dashboard.php');
   exit();
@@ -28,7 +24,6 @@ $expenses = $conn->query("
   ORDER BY er.id DESC
 ")->fetch_all(MYSQLI_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,6 +42,7 @@ $expenses = $conn->query("
       border-radius: 4px;
       font-size: 0.85rem;
       cursor: pointer;
+      text-decoration: none;
     }
     .open-btn:hover {
       opacity: 0.9;
@@ -60,7 +56,7 @@ $expenses = $conn->query("
 <div class="main-content">
   <div class="user-header" style="display: flex; justify-content: space-between; align-items: center;">
     <h2>Expense Requests</h2>
-    <a href="add_expense_sheet.php" class="add-user-btn">+ Add Expense Sheet</a>
+    <a href="php/add_expense.php" class="add-user-btn">+ Add Expense Sheet</a>
   </div>
 
   <table>
@@ -83,7 +79,7 @@ $expenses = $conn->query("
           <td><?= number_format($e['total_out'], 2) ?></td>
           <td><?= number_format($e['balance'], 2) ?></td>
           <td>
-            <a class="open-btn" href="php/view_expense.php?= $e['id'] ?>">Open</a>
+            <a class="open-btn" href="php/view_expense.php?id=<?= $e['id'] ?>">Open</a>
           </td>
         </tr>
       <?php endforeach; else: ?>
