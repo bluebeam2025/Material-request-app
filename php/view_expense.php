@@ -15,7 +15,21 @@ $request_id = (int)($_GET['id'] ?? 0);
 $user_id = (int)$_SESSION['user_id'];
 
 // Fetch sheet metadata
-$sheet = $conn->query("SELECT er.*, p.project_name FROM expense_requests er JOIN projects p ON p.id = er.project_id WHERE er.id = $request_id AND er.user_id = $user_id")->fetch_assoc();
+$sql = "SELECT er.*, p.project_name 
+        FROM expense_requests er 
+        JOIN projects p ON p.id = er.project_id 
+        WHERE er.id = $request_id AND er.user_id = $user_id";
+
+echo "<pre>DEBUG SQL: $sql</pre>";  // 🔍 Debug query
+echo "<pre>Request ID: $request_id | User ID: $user_id</pre>";
+
+$sheet = $conn->query($sql)->fetch_assoc();
+
+if (!$sheet) {
+    echo "<p>❌ Sheet not found or access denied. Check the above values.</p>";
+    exit();
+}
+
 if (!$sheet) {
   echo "<p>Sheet not found or access denied.</p>";
   exit();
