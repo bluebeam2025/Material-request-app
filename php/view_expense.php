@@ -57,20 +57,36 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
         </tr>
       </thead>
       <tbody>
-        <?php $total_in = 0; $total_out = 0; $sn = 1; foreach ($entries as $e): 
-          $total_in += $e['cash_in'];
-          $total_out += $e['cash_out'];
-        ?>
-          <tr>
-            <td><?= $sn++ ?></td>
-            <td><input name="description[]" value="<?= htmlspecialchars($e['description']) ?>"></td>
-            <td><input name="category[]" value="<?= htmlspecialchars($e['category']) ?>"></td>
-            <td><input type="number" step="0.01" name="cash_in[]" value="<?= $e['cash_in'] ?>"></td>
-            <td><input type="number" step="0.01" name="cash_out[]" value="<?= $e['cash_out'] ?>"></td>
-            <td><textarea name="remarks[]"><?= htmlspecialchars($e['remarks']) ?></textarea></td>
-            <input type="hidden" name="entry_ids[]" value="<?= $e['id'] ?>">
-          </tr>
-        <?php endforeach; ?>
+      <?php
+$total_in = 0;
+$total_out = 0;
+$sn = 1;
+foreach ($entries as $e):
+  $total_in += $e['cash_in'];
+  $total_out += $e['cash_out'];
+?>
+<tr>
+  <td><?= $sn++ ?></td>
+  <input type="hidden" name="entry_ids[]" value="<?= $e['id'] ?>">
+  <td><input name="description[]" value="<?= htmlspecialchars($e['description']) ?>"></td>
+  <td><input name="category[]" value="<?= htmlspecialchars($e['category']) ?>"></td>
+  <td><input type="number" step="0.01" name="cash_in[]" value="<?= $e['cash_in'] ?>"></td>
+  <td><input type="number" step="0.01" name="cash_out[]" value="<?= $e['cash_out'] ?>"></td>
+  <td><textarea name="remarks[]"><?= htmlspecialchars($e['remarks']) ?></textarea></td>
+</tr>
+<?php endforeach; ?>
+
+<!-- Empty row for new entry -->
+<tr>
+  <td><?= $sn++ ?></td>
+  <input type="hidden" name="entry_ids[]" value="0">
+  <td><input name="description[]" value=""></td>
+  <td><input name="category[]" value=""></td>
+  <td><input type="number" step="0.01" name="cash_in[]" value="0"></td>
+  <td><input type="number" step="0.01" name="cash_out[]" value="0"></td>
+  <td><textarea name="remarks[]"></textarea></td>
+</tr>
+
       </tbody>
       <tfoot>
         <tr>
