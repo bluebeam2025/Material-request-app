@@ -87,7 +87,9 @@ foreach ($entries as $e):
   <td><textarea name="remarks[]"></textarea></td>
 </tr>
 
-      </tbody>
+       <tbody id="newRows"></tbody>
+      <button type="button" onclick="addNewRow()">+ Add Row</button>
+
       <tfoot>
         <tr>
           <th colspan="3">Total</th>
@@ -100,4 +102,23 @@ foreach ($entries as $e):
     <button class="save-btn">Save Changes</button>
   </form>
 </div>
+<script>
+function addNewRow() {
+  const tbody = document.getElementById("newRows");
+  const rowCount = tbody.rows.length + 1;
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${rowCount}</td>
+    <input type="hidden" name="entry_ids[]" value="0">
+    <td><input name="description[]" value=""></td>
+    <td><input name="category[]" value=""></td>
+    <td><input type="number" step="0.01" name="cash_in[]" value="0"></td>
+    <td><input type="number" step="0.01" name="cash_out[]" value="0"></td>
+    <td><textarea name="remarks[]"></textarea></td>
+  `;
+  tbody.appendChild(tr);
+}
+</script>
+
 </body></html>
