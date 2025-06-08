@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-include('db_connect.php');
+include 'db_connect.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
   header("Location: dashboard.php");
@@ -16,8 +16,6 @@ $user_id = (int)$_SESSION['user_id'];
 
 // Fetch sheet metadata
 $sheet = $conn->query("SELECT er.*, p.project_name FROM expense_requests er JOIN projects p ON p.id = er.project_id WHERE er.id = $request_id AND er.user_id = $user_id")->fetch_assoc();
-
-
 if (!$sheet) {
   echo "<p>Sheet not found or access denied.</p>";
   exit();
@@ -70,6 +68,7 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
             <td><input type="number" step="0.01" name="cash_in[]" value="<?= $e['cash_in'] ?>"></td>
             <td><input type="number" step="0.01" name="cash_out[]" value="<?= $e['cash_out'] ?>"></td>
             <td><textarea name="remarks[]"><?= htmlspecialchars($e['remarks']) ?></textarea></td>
+            <input type="hidden" name="entry_ids[]" value="<?= $e['id'] ?>">
           </tr>
         <?php endforeach; ?>
       </tbody>
