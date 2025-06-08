@@ -1,10 +1,11 @@
+// ✅ FILE: php/view_expense.php
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-include 'db_connect.php';
+include('db_connect.php');
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
   header("Location: dashboard.php");
@@ -31,10 +32,31 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
   <link rel="stylesheet" href="../css/style.css">
   <style>
     table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; }
-    th, td { padding: 10px 12px; border: 1px solid #ccc; font-size: 0.92rem; color: #000; }
+    th, td { padding: 10px 12px; border: 1px solid #ccc; font-size: 0.92rem; color: #000; text-align: center; }
     th { background: #0d47a1; color: #fff; }
     input, textarea { width: 100%; border: none; padding: 6px; }
-    .save-btn { background: #2e7d32; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; margin-top: 10px; }
+    .save-btn { background: #2e7d32; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer; }
+    .add-btn {
+      background: #1565c0;
+      color: #fff;
+      padding: 7px 14px;
+      border: none;
+      border-radius: 4px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .add-btn:hover { opacity: 0.9; }
+    .del-btn {
+      background: #c62828;
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-top: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .del-btn:hover { opacity: 0.85; }
   </style>
 </head><body>
 <?php include '../partials/sidebar.php'; ?>
@@ -45,7 +67,7 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
 
   <form method="POST" action="update_expense.php">
     <input type="hidden" name="request_id" value="<?= $sheet['id'] ?>">
-    <table>
+    <table id="expenseTable">
       <thead>
         <tr>
           <th>SN</th>
@@ -54,71 +76,51 @@ $entries = $conn->query("SELECT * FROM expense_entries WHERE request_id = $reque
           <th>Cash In</th>
           <th>Cash Out</th>
           <th>Remarks</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
-      <?php
-$total_in = 0;
-$total_out = 0;
-$sn = 1;
-foreach ($entries as $e):
-  $total_in += $e['cash_in'];
-  $total_out += $e['cash_out'];
-?>
-<tr>
-  <td><?= $sn++ ?></td>
-  <input type="hidden" name="entry_ids[]" value="<?= $e['id'] ?>">
-  <td><input name="description[]" value="<?= htmlspecialchars($e['description']) ?>"></td>
-  <td><input name="category[]" value="<?= htmlspecialchars($e['category']) ?>"></td>
-  <td><input type="number" step="0.01" name="cash_in[]" value="<?= $e['cash_in'] ?>"></td>
-  <td><input type="number" step="0.01" name="cash_out[]" value="<?= $e['cash_out'] ?>"></td>
-  <td><textarea name="remarks[]"><?= htmlspecialchars($e['remarks']) ?></textarea></td>
-</tr>
-<?php endforeach; ?>
-
-<!-- Empty row for new entry -->
-<tr>
-  <td><?= $sn++ ?></td>
-  <input type="hidden" name="entry_ids[]" value="0">
-  <td><input name="description[]" value=""></td>
-  <td><input name="category[]" value=""></td>
-  <td><input type="number" step="0.01" name="cash_in[]" value="0"></td>
-  <td><input type="number" step="0.01" name="cash_out[]" value="0"></td>
-  <td><textarea name="remarks[]"></textarea></td>
-</tr>
-
-       <tbody id="newRows"></tbody>
-      <button type="button" onclick="addNewRow()">+ Add Row</button>
-
+        <?php $total_in = 0; $total_out = 0; $sn = 1; foreach ($entries as $e): 
+          $total_in += $e['cash_in'];
+          $total_out += $e['cash_out'];
+        ?>
+          <tr>
+            <td><?= $sn++ ?></td>
+            <td><input name="description[]" value="<?= htmlspecialchars($e['description']) ?>"></td>
+            <td><input name="category[]" value="<?= htmlspecialchars($e['category']) ?>"></td>
+            <td><input type="number" step="0.01" name="cash_in[]" value="<?= $e['cash_in'] ?>"></td>
+            <td><input type="number" step="0.01" name="cash_out[]" value="<?= $e['cash_out'] ?>"></td>
+            <td><textarea name="remarks[]"><?= htmlspecialchars($e['remarks']) ?></textarea></td>
+            <td><button type="button" class="del-btn" onclick="this.closest('tr').remove();">×</button></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
       <tfoot>
         <tr>
           <th colspan="3">Total</th>
           <th><?= number_format($total_in, 2) ?></th>
           <th><?= number_format($total_out, 2) ?></th>
-          <th><?= number_format($total_in - $total_out, 2) ?></th>
+          <th colspan="2"><?= number_format($total_in - $total_out, 2) ?></th>
         </tr>
       </tfoot>
     </table>
+    <button type="button" class="add-btn" onclick="addNewRow()">+ Add Row</button>
     <button class="save-btn">Save Changes</button>
   </form>
 </div>
 <script>
 function addNewRow() {
-  const tbody = document.getElementById("newRows");
-  const rowCount = tbody.rows.length + 1;
-
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${rowCount}</td>
-    <input type="hidden" name="entry_ids[]" value="0">
-    <td><input name="description[]" value=""></td>
-    <td><input name="category[]" value=""></td>
-    <td><input type="number" step="0.01" name="cash_in[]" value="0"></td>
-    <td><input type="number" step="0.01" name="cash_out[]" value="0"></td>
+  const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
+  const row = table.insertRow();
+  row.innerHTML = `
+    <td>New</td>
+    <td><input name="description[]"></td>
+    <td><input name="category[]"></td>
+    <td><input type="number" step="0.01" name="cash_in[]"></td>
+    <td><input type="number" step="0.01" name="cash_out[]"></td>
     <td><textarea name="remarks[]"></textarea></td>
+    <td><button type="button" class="del-btn" onclick="this.closest('tr').remove();">×</button></td>
   `;
-  tbody.appendChild(tr);
 }
 </script>
-
 </body></html>
