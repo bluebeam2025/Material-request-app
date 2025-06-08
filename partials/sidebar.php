@@ -15,7 +15,7 @@ $user_type = $_SESSION['user_type'] ?? null;
     <a href="dashboard.php">Dashboard</a>
 
     <?php if ($user_type === 'user'): ?>
-      <a href="#">php/material_request</a>
+      <a href="#">Material Requests</a>
       <a href="#">Leave Request</a>
       <a href="#">Expense Request</a>
     <?php endif; ?>
