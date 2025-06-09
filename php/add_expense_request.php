@@ -28,7 +28,7 @@ if (!$project_id || !$amount || !$request_date || !$required_date || !$approver1
 }
 
 $stmt = $conn->prepare("
-  INSERT INTO expense_request 
+  INSERT INTO expense_requests 
   (user_id, project_id, amount, request_date, required_date, sheet_id, approver1_id, approver2_id)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 ");
