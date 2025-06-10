@@ -25,11 +25,11 @@ $projects = $conn->query("
   <link rel="stylesheet" href="css/style.css" />
   <style>
     table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; }
-    th, td { border: 1px solid #ccc; padding: 8px; font-size: 0.92rem; color: #000 }
+    th, td { border: 1px solid #ccc; padding: 14px; font-size: 1rem; color: #000 } /* Increased padding for taller rows */
     th { background: #0d47a1; color: #fff }
-    .submit-btn { background: #0d47a1; color: #fff; padding: 8px 14px; border: none; border-radius: 6px; margin-top: 12px; cursor: pointer }
+    .submit-btn { background: #0d47a1; color: #fff; padding: 10px 16px; border: none; border-radius: 6px; margin-top: 14px; cursor: pointer }
     .submit-btn:hover { opacity: 0.9 }
-    .add-btn { background: #1565c0; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; margin-top: 8px; }
+    .add-btn { background: #1565c0; color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 0.95rem; margin-top: 8px; }
     textarea { resize: vertical; }
   </style>
 </head>
@@ -39,7 +39,7 @@ $projects = $conn->query("
 
 <div class="main-content">
   <h2>Add Expense Sheet</h2>
-  <form method="POST" action="php/add_expense.php">
+  <form method="POST" action="php/add_expense.php" enctype="multipart/form-data">
     <label>Select Project</label>
     <select name="project_id" required>
       <option value="">Select project</option>
@@ -56,6 +56,8 @@ $projects = $conn->query("
           <th>Category</th>
           <th>Cash In</th>
           <th>Cash Out</th>
+          <th>Entry Date</th>
+          <th>Invoice File</th>
           <th>Remarks</th>
           <th></th>
         </tr>
@@ -67,6 +69,8 @@ $projects = $conn->query("
           <td><input type="text" name="category[]" required></td>
           <td><input type="number" step="0.01" name="cash_in[]" value="0"></td>
           <td><input type="number" step="0.01" name="cash_out[]" value="0"></td>
+          <td><input type="date" name="entry_date[]" required></td>
+          <td><input type="file" name="invoice[]" accept=".pdf,.jpeg,.jpg,.png"></td>
           <td><textarea name="remarks[]"></textarea></td>
           <td><button type="button" onclick="removeRow(this)">✖</button></td>
         </tr>
@@ -83,7 +87,10 @@ function addRow() {
   const table = document.getElementById('expenseTable').getElementsByTagName('tbody')[0];
   const rowCount = table.rows.length + 1;
   const row = table.rows[0].cloneNode(true);
-  row.querySelectorAll('input, textarea').forEach(el => el.value = '');
+  row.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'file') return; // do not reset file input
+    el.value = '';
+  });
   row.cells[0].innerText = rowCount;
   table.appendChild(row);
 }
@@ -92,6 +99,8 @@ function removeRow(btn) {
   const table = row.parentNode;
   if (table.rows.length > 1) {
     row.remove();
+    // Renumber rows
+    [...table.rows].forEach((r, i) => r.cells[0].innerText = i + 1);
   }
 }
 </script>
