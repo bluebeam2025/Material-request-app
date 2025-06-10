@@ -15,9 +15,9 @@ $user_type = $_SESSION['user_type'] ?? null;
     <a href="dashboard.php">Dashboard</a>
 
     <?php if ($user_type === 'user'): ?>
-      <a href="#">Material Requests</a>
-      <a href="#">Leave Request</a>
-      <a href="#">Expense Request</a>
+      <a href="material_request.php">Material Requests</a>
+      <a href="leave_request.php">Leave Request</a>
+      <a href="expense_request.php">Expense Request</a>
     <?php endif; ?>
 
     <?php if (in_array($user_type, ['approver1', 'approver2', 'admin'])): ?>
