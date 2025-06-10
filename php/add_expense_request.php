@@ -17,30 +17,26 @@ $project_id = (int)($_POST['project_id'] ?? 0);
 $amount = (float)($_POST['amount'] ?? 0);
 $request_date = $_POST['request_date'] ?? '';
 $required_date = $_POST['required_date'] ?? '';
+$sheet_id = (int)($_POST['sheet_id'] ?? 0);
 $approver1_id = (int)($_POST['approver1_id'] ?? 0);
 $approver2_id = (int)($_POST['approver2_id'] ?? 0);
 
-// NOTE: related_request_id field not present in table, so we ignore it safely!
+// Default status when submitting request
+$status = 'Pending-L1';
 
-// Basic validation
 if (!$project_id || !$amount || !$request_date || !$required_date || !$approver1_id || !$approver2_id) {
   $_SESSION['error'] = 'All fields are required.';
   header('Location: ../expense_request.php');
   exit();
 }
 
-// Insert into expense_requests table
 $stmt = $conn->prepare("
   INSERT INTO expense_requests 
-  (user_id, project_id, amount, request_date, required_date, approver1_id, approver2_id, status)
-  VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending-L1')
+  (user_id, project_id, amount, request_date, required_date, sheet_id, approver1_id, approver2_id, status)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
-if ($stmt === false) {
-    die("Prepare failed: " . $conn->error); // for debugging only
-}
-
-$stmt->bind_param('iidssii', $user_id, $project_id, $amount, $request_date, $required_date, $approver1_id, $approver2_id);
+$stmt->bind_param('iidssiiis', $user_id, $project_id, $amount, $request_date, $required_date, $sheet_id, $approver1_id, $approver2_id, $status);
 
 if ($stmt->execute()) {
   $_SESSION['success'] = 'Expense request submitted successfully.';
