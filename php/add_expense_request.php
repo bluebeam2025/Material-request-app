@@ -16,6 +16,8 @@ $required_date = $_POST['required_date'] ?? '';
 $approver1_id = (int)($_POST['approver1_id'] ?? 0);
 $approver2_id = (int)($_POST['approver2_id'] ?? 0);
 
+// NOTE: related_request_id field not present in table, so we ignore it safely!
+
 // Basic validation
 if (!$project_id || !$amount || !$request_date || !$required_date || !$approver1_id || !$approver2_id) {
   $_SESSION['error'] = 'All fields are required.';
@@ -29,6 +31,10 @@ $stmt = $conn->prepare("
   (user_id, project_id, amount, request_date, required_date, approver1_id, approver2_id, status)
   VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending-L1')
 ");
+
+if ($stmt === false) {
+    die("Prepare failed: " . $conn->error); // for debugging only
+}
 
 $stmt->bind_param('iidssii', $user_id, $project_id, $amount, $request_date, $required_date, $approver1_id, $approver2_id);
 
