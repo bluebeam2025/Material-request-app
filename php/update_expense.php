@@ -6,104 +6,90 @@ error_reporting(E_ALL);
 
 include 'db_connect.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
-    header('Location: ../dashboard.php');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $_SESSION['error'] = 'Invalid request method.';
+    header('Location: ../expense_request.php');
     exit();
 }
 
 $user_id = (int)$_SESSION['user_id'];
 $request_id = (int)($_POST['request_id'] ?? 0);
 
-// Security check: is this request_id owned by user?
-$check = $conn->query("SELECT id FROM expense_requests WHERE id = $request_id AND user_id = $user_id")->fetch_assoc();
-if (!$check) {
-    $_SESSION['error'] = 'Access denied.';
+if (!$request_id) {
+    $_SESSION['error'] = 'Invalid request.';
     header('Location: ../expense_request.php');
     exit();
 }
 
-// Read form data
-$entry_ids = $_POST['entry_id'] ?? [];
-$descriptions = $_POST['description'] ?? [];
-$categories = $_POST['category'] ?? [];
-$cash_in = $_POST['cash_in'] ?? [];
-$cash_out = $_POST['cash_out'] ?? [];
-$remarks = $_POST['remarks'] ?? [];
-$dates = $_POST['date'] ?? [];
-$delete_rows = $_POST['delete_row'] ?? [];
+// Fetch request owner
+$check = $conn->query("SELECT user_id FROM expense_requests WHERE id = $request_id")->fetch_assoc();
+if (!$check || $check['user_id'] != $user_id) {
+    $_SESSION['error'] = 'Unauthorized.';
+    header('Location: ../expense_request.php');
+    exit();
+}
 
-$total = count($entry_ids);
+// Process rows
+$ids       = $_POST['entry_id'] ?? [];
+$desc      = $_POST['description'] ?? [];
+$cat       = $_POST['category'] ?? [];
+$cash_in   = $_POST['cash_in'] ?? [];
+$cash_out  = $_POST['cash_out'] ?? [];
+$remarks   = $_POST['remarks'] ?? [];
+$del_flags = $_POST['delete_entry'] ?? [];
 
-// Handle deletions first
-if (!empty($delete_rows)) {
-    $idsToDelete = array_map('intval', $delete_rows);
-    $idsList = implode(',', $idsToDelete);
+// Prepare UPDATE
+$update = $conn->prepare("UPDATE expense_entries SET description=?, category=?, cash_in=?, cash_out=?, remarks=?, invoice_file=? WHERE id=? AND request_id=?");
 
-    // Optionally delete invoice files here too if needed!
-    $files = $conn->query("SELECT invoice_file FROM expense_entries WHERE id IN ($idsList)");
-    while ($f = $files->fetch_assoc()) {
-        if (!empty($f['invoice_file']) && file_exists("../uploads/".$f['invoice_file'])) {
-            unlink("../uploads/".$f['invoice_file']);
+// Prepare INSERT
+$insert = $conn->prepare("INSERT INTO expense_entries (request_id, description, category, cash_in, cash_out, remarks, invoice_file) VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+// Process each row
+for ($i = 0; $i < count($desc); $i++) {
+    $eid = (int)($ids[$i] ?? 0);
+    $d   = trim($desc[$i]);
+    $c   = trim($cat[$i]);
+    $in  = (float)($cash_in[$i]);
+    $out = (float)($cash_out[$i]);
+    $r   = trim($remarks[$i]);
+
+    // Handle file upload
+    $inv_file = '';
+    $fieldname = "invoice_file_$i";
+
+    if (isset($_FILES[$fieldname]) && $_FILES[$fieldname]['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES[$fieldname]['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, ['pdf', 'jpeg', 'jpg', 'png'])) {
+            $newname = 'uploads/invoice_' . time() . '_' . $i . '.' . $ext;
+            move_uploaded_file($_FILES[$fieldname]['tmp_name'], '../' . $newname);
+            $inv_file = $newname;
         }
     }
 
-    // Now delete rows
-    $conn->query("DELETE FROM expense_entries WHERE id IN ($idsList) AND request_id = $request_id");
-}
-
-// Prepare statements
-$update = $conn->prepare("
-    UPDATE expense_entries 
-    SET date=?, description=?, category=?, cash_in=?, cash_out=?, remarks=?, invoice_file=? 
-    WHERE id=? AND request_id=?");
-
-$insert = $conn->prepare("
-    INSERT INTO expense_entries (request_id, date, description, category, cash_in, cash_out, remarks, invoice_file)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-
-// Handle each row (update or insert)
-for ($i = 0; $i < $total; $i++) {
-    $eid = (int)$entry_ids[$i];
-    $desc = trim($descriptions[$i]);
-    $cat = trim($categories[$i]);
-    $in = (float)$cash_in[$i];
-    $out = (float)$cash_out[$i];
-    $remark = trim($remarks[$i]);
-    $date = trim($dates[$i]);
-
-    // Handle file upload (optional)
-    $invoice_filename = '';
-
-    if (isset($_FILES['invoice_file']['name'][$i]) && $_FILES['invoice_file']['error'][$i] === UPLOAD_ERR_OK) {
-        $tmp_name = $_FILES['invoice_file']['tmp_name'][$i];
-        $orig_name = basename($_FILES['invoice_file']['name'][$i]);
-        $ext = strtolower(pathinfo($orig_name, PATHINFO_EXTENSION));
-
-        if (in_array($ext, ['pdf', 'jpg', 'jpeg', 'png'])) {
-            $new_name = "inv_".$request_id."_".time()."_".$i.".".$ext;
-            move_uploaded_file($tmp_name, "../uploads/".$new_name);
-            $invoice_filename = $new_name;
-        }
+    // DELETE row if requested
+    if (isset($del_flags[$i]) && $del_flags[$i] == '1' && $eid > 0) {
+        $conn->query("DELETE FROM expense_entries WHERE id=$eid AND request_id=$request_id");
+        continue;
     }
 
     // UPDATE existing row
     if ($eid > 0) {
-        // If new file uploaded, use new file. Otherwise fetch old file
-        if (empty($invoice_filename)) {
-            $old = $conn->query("SELECT invoice_file FROM expense_entries WHERE id = $eid")->fetch_assoc();
-            $invoice_filename = $old['invoice_file'] ?? '';
+        // Fetch existing file if not new upload
+        if (!$inv_file) {
+            $row = $conn->query("SELECT invoice_file FROM expense_entries WHERE id=$eid")->fetch_assoc();
+            $inv_file = $row['invoice_file'] ?? '';
         }
 
-        $update->bind_param("sssddssii", $date, $desc, $cat, $in, $out, $remark, $invoice_filename, $eid, $request_id);
+        $update->bind_param("ssddssii", $d, $c, $in, $out, $r, $inv_file, $eid, $request_id);
         $update->execute();
     }
-    // INSERT new row if any field is provided
-    else if ($desc || $cat || $in > 0 || $out > 0 || $remark || $date) {
-        $insert->bind_param("issddsss", $request_id, $date, $desc, $cat, $in, $out, $remark, $invoice_filename);
+    // INSERT new row if at least one field filled
+    elseif ($d || $c || $in > 0 || $out > 0 || $r || $inv_file) {
+        $insert->bind_param("issddss", $request_id, $d, $c, $in, $out, $r, $inv_file);
         $insert->execute();
     }
 }
 
-$_SESSION['success'] = "Expense sheet updated.";
-header("Location: view_expense.php?id=$request_id");
+$_SESSION['success'] = 'Expense sheet updated.';
+header('Location: ../php/view_expense.php?id=' . $request_id);
 exit();
