@@ -1,41 +1,24 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 include 'db_connect.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
-    header('Location: ../dashboard.php');
-    exit();
-}
-
+$id = (int)($_GET['id'] ?? 0);
 $user_id = (int)$_SESSION['user_id'];
-$request_id = (int)($_GET['id'] ?? 0);
 
-// Check if this request belongs to user
-$check = $conn->query("SELECT id FROM expense_requests WHERE id = $request_id AND user_id = $user_id")->fetch_assoc();
+// Check if sheet belongs to user
+$check = $conn->query("SELECT id FROM expense_sheets WHERE id=$id AND user_id=$user_id")->fetch_assoc();
 if (!$check) {
-    $_SESSION['error'] = 'Access denied or sheet not found.';
+    $_SESSION['error'] = 'Unauthorized or invalid sheet.';
     header('Location: ../expense_request.php');
     exit();
 }
 
-// Delete invoice files first
-$files = $conn->query("SELECT invoice_file FROM expense_entries WHERE request_id = $request_id");
-while ($f = $files->fetch_assoc()) {
-    if (!empty($f['invoice_file']) && file_exists("../uploads/".$f['invoice_file'])) {
-        unlink("../uploads/".$f['invoice_file']);
-    }
-}
+// Delete entries first due to FK
+$conn->query("DELETE FROM expense_entries WHERE sheet_id = $id");
 
-// Delete expense entries
-$conn->query("DELETE FROM expense_entries WHERE request_id = $request_id");
+// Then delete sheet
+$conn->query("DELETE FROM expense_sheets WHERE id = $id");
 
-// Delete expense sheet
-$conn->query("DELETE FROM expense_requests WHERE id = $request_id AND user_id = $user_id");
-
-$_SESSION['success'] = 'Expense sheet deleted successfully.';
+$_SESSION['success'] = 'Expense sheet deleted.';
 header('Location: ../expense_request.php');
 exit();
