@@ -22,10 +22,10 @@ if ($entry && $entry['invoice_file']) {
     if (file_exists($file_path)) {
         unlink($file_path);
     }
+
+    $conn->query("UPDATE expense_entries SET invoice_file = NULL WHERE id = $entry_id");
 }
 
-$conn->query("DELETE FROM expense_entries WHERE id = $entry_id");
-
-$_SESSION['success'] = "Expense entry deleted.";
+$_SESSION['success'] = "Invoice deleted.";
 header("Location: view_expense.php?id=$sheet_id");
 exit();
